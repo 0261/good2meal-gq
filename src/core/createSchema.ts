@@ -1,9 +1,7 @@
 import { buildSchema } from 'type-graphql';
-import path from 'path';
-
-const resolversPath = path.resolve(__dirname, '..', 'resolvers');
+import { UserResolver } from '../resolvers/User.resolver';
 
 export const createSchema = async () =>
     await buildSchema({
-        resolvers: [`${resolversPath}/**/*.ts`],
+        resolvers: [UserResolver],
     });
