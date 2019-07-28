@@ -15,7 +15,6 @@ import bodyParser from 'body-parser';
 class Application {
     private readonly app: Express.Application = Express();
     constructor() {
-        this.app.use();
         console.log('start');
     }
     async start() {
