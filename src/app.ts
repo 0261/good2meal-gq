@@ -1,25 +1,21 @@
 import Express from 'express';
-import {
-    RequestHandlerParams,
-    RequestHandler,
-} from 'express-serve-static-core';
+import { RequestHandlerParams } from 'express-serve-static-core';
+
 import { ApolloServer } from 'apollo-server-express';
 import { createSchema } from './core/createSchema';
-import { createConnection } from 'typeorm';
+import { Container } from 'typedi';
+import { Database } from './services/database';
 import { ormConfig } from './ormconfig';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import cors from 'cors';
-import bodyParser from 'body-parser';
 
 class Application {
+    private readonly database: Database = Container.get(Database);
     private readonly app: Express.Application = Express();
     constructor() {
         console.log('start');
     }
-    async start() {
+    async start(): Promise<void> {
         try {
-            await createConnection(ormConfig);
+            await this.database.createConnection(ormConfig);
             const server = new ApolloServer({
                 schema: await createSchema(),
             });
@@ -28,7 +24,6 @@ class Application {
                 console.log('http://localhost:4000/graphql'),
             );
         } catch (error) {
-            console.log(error.message);
             throw new Error('database connect fail');
         }
     }
