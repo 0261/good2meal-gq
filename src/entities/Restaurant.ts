@@ -11,21 +11,27 @@ import { Keyword } from './Keyword';
 import { Image } from './Image';
 import { Tag } from './Tag';
 import { Comment } from './Comment';
+import { Field, ObjectType } from 'type-graphql';
 
 @Entity()
+@ObjectType()
 export class Restaurant extends Base {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Field({ description: '음식점 이름' })
     @Column('varchar', { nullable: false, comment: '음식점 이름' })
     name!: string;
     @Column('varchar', { nullable: false, comment: '음식점 주소' })
+    @Field({ description: '음식점 번호' })
     address!: string;
     @Column('varchar', { nullable: false, comment: '음식점 가게번호' })
+    @Field({ description: '음식점 주소' })
     phone!: string;
 
     @ManyToMany(type => Keyword)
     @JoinTable({ name: 'restaurantAndKeyword' })
+    @Field(type => [Keyword], { description: '가게 키워드' })
     keywords!: Array<Keyword>;
 
     @ManyToMany(type => Tag)
