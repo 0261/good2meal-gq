@@ -1,7 +1,8 @@
-import { Resolver, Query, Arg, Args } from 'type-graphql';
-import { GetAllRestaurant } from './Restaurant.input';
+import { Resolver, Query, Arg, Args, Mutation } from 'type-graphql';
+
 import { getManager } from 'typeorm';
 import { Restaurant } from '../../entities/Restaurant';
+import { UpdateRestaurant, DeleteRestaurant } from './restaurant.input';
 
 @Resolver()
 export class RestaurantResolver {
@@ -26,6 +27,26 @@ export class RestaurantResolver {
                 .getRepository<Restaurant>('restaurant')
                 .findOneOrFail({ id });
             return restaurant;
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    @Mutation(returns => String)
+    async updateRestaurant(@Arg('input') input: UpdateRestaurant) {
+        try {
+            console.log(input);
+            return '';
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    @Mutation(returns => String)
+    async deleteRestaurant(@Arg('input') input: DeleteRestaurant) {
+        try {
+            console.log(input);
+            return '';
         } catch (error) {
             throw new Error(error);
         }
