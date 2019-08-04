@@ -3,9 +3,11 @@ import { Resolver, Query, Arg, Args, Mutation } from 'type-graphql';
 import { getManager } from 'typeorm';
 import { Restaurant } from '../../entities/Restaurant';
 import { UpdateRestaurant, DeleteRestaurant } from './restaurant.input';
+import { DynamoDB } from '../../services/dynamodb';
 
 @Resolver()
 export class RestaurantResolver {
+    constructor(private readonly dynamodb: DynamoDB) {}
     @Query(returns => [Restaurant], { description: '전체 음식점' })
     async getAllRestaurant(): Promise<Array<Restaurant>> {
         try {
