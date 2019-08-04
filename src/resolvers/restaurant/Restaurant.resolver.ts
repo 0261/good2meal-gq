@@ -1,9 +1,12 @@
 import { Resolver, Query, Arg, Args, Mutation } from 'type-graphql';
-
-import { getManager } from 'typeorm';
-import { Restaurant } from '../../entities/Restaurant';
+import {
+    Expression,
+    equal,
+    UpdateExpression,
+} from '@typemon/dynamodb-expression';
 import { UpdateRestaurant, DeleteRestaurant } from './restaurant.input';
 import { DynamoDB } from '../../services/dynamodb';
+import { Restaurant } from '../../models/Restaurant';
 
 @Resolver()
 export class RestaurantResolver {
@@ -11,9 +14,11 @@ export class RestaurantResolver {
     @Query(returns => [Restaurant], { description: '전체 음식점' })
     async getAllRestaurant(): Promise<Array<Restaurant>> {
         try {
-            const restaurants = await getManager()
-                .getRepository<Restaurant>('restaurant')
-                .find();
+            const query: Expression = equal('location', '구로디지털단지');
+            const restaurants = (await this.dynamodb.query(
+                'good2meal',
+                query,
+            )) as Array<Restaurant>;
             return restaurants;
         } catch (error) {
             throw new Error(error);
@@ -22,12 +27,14 @@ export class RestaurantResolver {
 
     @Query(returns => Restaurant, { description: '단일 음식점' })
     async getRestaurant(
-        @Arg('id', { description: '조회 할 음식점 아이디' }) id: number,
+        @Arg('id', { description: '조회 할 음식점 아이디' }) id: string,
     ): Promise<Restaurant> {
         try {
-            const restaurant = await getManager()
-                .getRepository<Restaurant>('restaurant')
-                .findOneOrFail({ id });
+            const getQuery = {
+                id,
+                location: '구로디지털단지',
+            };
+            const restaurant = await this.dynamodb.get('good2meal', getQuery);
             return restaurant;
         } catch (error) {
             throw new Error(error);
