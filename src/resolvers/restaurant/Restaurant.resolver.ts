@@ -4,22 +4,29 @@ import {
     equal,
     UpdateExpression,
 } from '@typemon/dynamodb-expression';
-import { UpdateRestaurant, DeleteRestaurant } from './restaurant.input';
+import {
+    UpdateRestaurant,
+    DeleteRestaurant,
+    SearchResultUnion,
+    Key,
+} from './restaurant.type';
 import { DynamoDB } from '../../services/dynamodb';
 import { Restaurant } from '../../models/Restaurant';
 
 @Resolver()
 export class RestaurantResolver {
     constructor(private readonly dynamodb: DynamoDB) {}
-    @Query(returns => [Restaurant], { description: '전체 음식점' })
-    async getAllRestaurant(): Promise<Array<Restaurant>> {
+    @Query(returns => [SearchResultUnion], { description: '전체 음식점' })
+    async getAllRestaurant() {
         try {
             const query: Expression = equal('location', '구로디지털단지');
-            const restaurants = (await this.dynamodb.query(
+            const { Items, LastEvaluatedKey } = await this.dynamodb.query(
                 'good2meal',
                 query,
-            )) as Array<Restaurant>;
-            return restaurants;
+            );
+            const restaurants = Items as Array<Restaurant>;
+            const lastEvaluatedKey = LastEvaluatedKey as Key;
+            return [...restaurants];
         } catch (error) {
             throw new Error(error);
         }
