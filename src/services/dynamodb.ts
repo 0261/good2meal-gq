@@ -79,7 +79,8 @@ export class DynamoDB {
         filterExpression?: Expression,
         option?: Option,
         index?: string,
-    ): Promise<Array<DocumentClient.QueryOutput>> {
+        exclusiveStartKey?: any,
+    ): Promise<DocumentClient.QueryOutput> {
         try {
             const parameter: DocumentClient.QueryInput = {
                 TableName: tableName,
@@ -102,7 +103,7 @@ export class DynamoDB {
             const result: DocumentClient.QueryOutput = await this.client
                 .query(parameter)
                 .promise();
-            return result.Items as Array<DocumentClient.QueryOutput>;
+            return result;
         } catch (error) {
             console.log('query', error);
             throw new Error(error);
