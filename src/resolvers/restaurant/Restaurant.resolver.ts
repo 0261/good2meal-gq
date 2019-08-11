@@ -4,29 +4,33 @@ import {
     equal,
     UpdateExpression,
 } from '@typemon/dynamodb-expression';
-import {
-    UpdateRestaurant,
-    DeleteRestaurant,
-    SearchResultUnion,
-    Key,
-} from './restaurant.type';
+import { UpdateRestaurant, DeleteRestaurant, Key } from './restaurant.type';
 import { DynamoDB } from '../../services/dynamodb';
 import { Restaurant } from '../../models/Restaurant';
 
 @Resolver()
 export class RestaurantResolver {
     constructor(private readonly dynamodb: DynamoDB) {}
-    @Query(returns => [SearchResultUnion], { description: '전체 음식점' })
-    async getAllRestaurant() {
+    @Query(returns => [Restaurant], { description: '전체 음식점' })
+    async getAllRestaurant(
+        @Arg('tag', { nullable: true }) tag: string,
+        @Arg('last', { nullable: true }) last: string,
+    ) {
         try {
+            const ExclusiveStartKey = last
+                ? { id: last, location: '구로디지털단지' }
+                : undefined;
+
             const query: Expression = equal('location', '구로디지털단지');
             const { Items, LastEvaluatedKey } = await this.dynamodb.query(
                 'good2meal',
                 query,
+                undefined,
+                { ExclusiveStartKey },
             );
             const restaurants = Items as Array<Restaurant>;
             const lastEvaluatedKey = LastEvaluatedKey as Key;
-            return [...restaurants];
+            return restaurants;
         } catch (error) {
             throw new Error(error);
         }
@@ -37,11 +41,11 @@ export class RestaurantResolver {
         @Arg('id', { description: '조회 할 음식점 아이디' }) id: string,
     ): Promise<Restaurant> {
         try {
-            const getQuery = {
+            const query = {
                 id,
                 location: '구로디지털단지',
             };
-            const restaurant = await this.dynamodb.get('good2meal', getQuery);
+            const restaurant = await this.dynamodb.get('good2meal', query);
             return restaurant;
         } catch (error) {
             throw new Error(error);
