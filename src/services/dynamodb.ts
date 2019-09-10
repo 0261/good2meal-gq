@@ -8,6 +8,14 @@ import { Service } from 'typedi';
 import moment from 'moment';
 import { AWSError } from 'aws-sdk/lib/error';
 
+type TableName = 'good2meal';
+
+interface Tables {
+    good2meal: {
+        primaryKey: 'location';
+    };
+}
+
 interface Option {
     Limit?: number;
     ScanIndexForward?: boolean;
@@ -23,8 +31,8 @@ export class DynamoDB {
         });
     }
     public async put(
-        tableName: string,
-        data: any,
+        tableName: TableName,
+        data: Tables[TableName],
     ): Promise<DocumentClient.PutItemOutput | AWSError> {
         try {
             const item = this.changeEmptyStringToDefaultValue(data);
@@ -54,7 +62,7 @@ export class DynamoDB {
         }
     }
     public async get(
-        tableName: string,
+        tableName: TableName,
         primaryKey: DocumentClient.Key,
     ): Promise<any> {
         try {
@@ -74,7 +82,7 @@ export class DynamoDB {
         }
     }
     public async query(
-        tableName: string,
+        tableName: TableName,
         keyConditionExpression: Expression,
         filterExpression?: Expression,
         option?: Option,
@@ -110,7 +118,7 @@ export class DynamoDB {
         }
     }
     public async update(
-        tableName: string,
+        tableName: TableName,
         key: DocumentClient.Key,
         updatePayload: { [key: string]: any },
     ): Promise<DocumentClient.UpdateItemOutput> {
