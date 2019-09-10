@@ -21,7 +21,7 @@ export class RestaurantResolver {
                 ? { id: last, location: '구로디지털단지' }
                 : undefined;
 
-            const query: Expression = equal('location', '구로디지털단지');
+            const query = equal('location', '구로디지털단지');
             const { Items, LastEvaluatedKey } = await this.dynamodb.query(
                 'good2meal',
                 query,
